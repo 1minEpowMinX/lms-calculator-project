@@ -1,0 +1,127 @@
+/* Скрыть все страницы по умолчанию, кроме первой */
+.page {
+	display: none;
+}
+
+/* Показать только одну страницу, активную в данный момент */
+.active-page {
+	display: block;
+}
+
+/* Стили для меню */
+.menu {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	background-color: white;
+	border-bottom: black solid 2px;
+	padding-bottom: 20px;
+}
+
+.menu li {
+	display: inline;
+	margin-right: 10px;
+	position: relative;
+}
+
+.menu li a {
+	text-decoration: none;
+	font-weight: bold;
+	color: black;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.active-menu-item::after,
+.active-menu-item::before {
+	content: '';
+	/* Создаем псевдоэлемент */
+	display: block;
+	width: 100%;
+	height: 5px;
+	/* Высота полосы */
+	background-color: #0f5e53;
+	/* Цвет подсветки выбранного пункта меню */
+	position: absolute;
+	/* Абсолютное позиционирование относительно родительского элемента */
+	bottom: -10px;
+	/* Располагаем псевдоэлемент внизу */
+	left: 0;
+}
+
+h1 {
+	background-color: #0f5e53;
+	/* Горизонтальное смещение, вертикальное смещение, размытие, цвет тени */
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+	color: #fff;
+	padding: 10px;
+	border-radius: 3px;
+}
+
+h1>span {
+	font-size: 0.5em
+}
+
+label {
+	display: block;
+	font-size: 120%;
+	white-space: nowrap;
+}
+
+input,
+label {
+	margin: 5px 0;
+	width: 250px;
+	height: 25px;
+}
+
+input:active,
+input:focus,
+input:hover {
+	border: 3px solid #0f5e53;
+	/* Установка обводки при фокусе */
+}
+
+#message {
+	display: block;
+	font-size: 120%;
+	white-space: nowrap;
+	margin: 5px 0;
+	border-top: black solid 2px;
+	padding-top: 20px;
+}
+
+#expressions {
+	display: block;
+	margin: 5px 0;
+	font-size: 120%;
+	border-bottom: black solid 2px;
+	padding-top: 5px;
+	padding-bottom: 10px;
+}
+
+button#applySettings {
+	/* margin: 5px; */
+	margin-left: 193px;
+	margin-top: 10px;
+	width: 65px;
+	height: 35px;
+	color: white;
+	background-color: #0f5e53;
+	border: #0f5e53;
+	border-radius: 5px;
+
+}
+
+button#sendRequest {
+	/* margin: 5px; */
+	margin-left: 10px;
+	margin-top: 10px;
+	width: 100px;
+	height: 30px;
+	color: white;
+	background-color: #0f5e53;
+	border: #0f5e53;
+	border-radius: 5px;
+
+}
