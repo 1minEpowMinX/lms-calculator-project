@@ -235,6 +235,8 @@ func CalcMachine(expression *Expression, cpuNum int) bool {
 	defer expressionsStore.wg.Done()
 	expressionsStore.mu.Lock()
 
+	expression.Status = "Expression in the calculation process"
+
 	operationsList := make([]string, 0, len(expression.Content))
 	totalWaitTime := 0
 	for _, char := range expression.Content {
