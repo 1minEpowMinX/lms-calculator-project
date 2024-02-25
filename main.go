@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+// main is the entry point of the program.
+//
+// It doesn't take any parameters and doesn't return anything.
 func main() {
 	// Получение текущей директории
 	currentDir, err := os.Getwd()
@@ -28,6 +31,9 @@ func main() {
 	select {}
 }
 
+// runServer runs the server using the specified file path.
+//
+// filePath string
 func runServer(filePath string) {
 	cmd := exec.Command("go", "run", filePath)
 	err := cmd.Run()
