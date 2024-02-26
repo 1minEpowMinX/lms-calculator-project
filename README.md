@@ -1,5 +1,6 @@
 # Distributed calculator of arithmetic expressions
-A user wants to count arithmetic expressions. He enters the string 2 + 2 * 2 and wants to get 6 as the answer. But our addition and multiplication operations (also division and subtraction) take a "very, very" long time.  
+A user wants to count arithmetic expressions. He enters the string 2 + 2 * 2 and wants to get 6 as the answer. But our operations of addition and multiplication (also division and subtraction) take a "very, very" long time. That's why the variant when the user makes an http-request and gets the result as a response is impossible. Moreover: calculation of each such operation in our "alternative reality" takes "gigantic" computing power. Accordingly, we must be able to perform each operation separately and scale this system by adding computing power to our system in the form of new "machines". Therefore, the user, sending an expression, receives an expression identifier in response and can check with the server at regular intervals to see if the expression has been calculated. If the expression is finally calculated - he will get the result. Remember that some parts of an arithmetic expression can be calculated in parallel.
+
 # Running Instructions for the Application
 
 This guide will help you run your application, consisting of backend and frontend servers, using the Go programming language.
