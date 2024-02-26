@@ -32,4 +32,8 @@ After completing the previous step, your servers will be up and running. Open a 
 - If you need to change ports or any other settings, you can do so by editing the corresponding configuration project files.
 - Make sure all project dependencies are installed. If you encounter any errors during the startup process, ensure all necessary dependencies are installed using `go get`.
 
+## How it works?
+  ![Untitled-2024-02-26-1032](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/6b96f03b-3b81-4258-aebd-1859438830cc)
+
+
 That should be all you need to run your application. Happy coding!
