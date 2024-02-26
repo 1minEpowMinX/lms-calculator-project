@@ -33,7 +33,8 @@ After completing the previous step, your servers will be up and running. Open a 
 - Make sure all project dependencies are installed. If you encounter any errors during the startup process, ensure all necessary dependencies are installed using `go get`.
 
 ## How it works?
-  ![Untitled-2024-02-26-1032](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/6b96f03b-3b81-4258-aebd-1859438830cc)
+  ![Untitled-2024-02-26-1032](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/393293f6-2bc8-478b-bfc2-1bb027eaa8e0)
+
 
 
 That should be all you need to run your application. Happy coding!
