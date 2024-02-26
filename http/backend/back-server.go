@@ -1,8 +1,12 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -10,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Knetic/govaluate"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -37,30 +42,54 @@ type ExpressionsStore struct {
 	MachineNums              int                 `json:"machine_nums"`
 	ComputationalCapabilitys map[string]string   `json:"computational_capabilities"`
 	CurrentWorkers           int                 `json:"current_workers"`
+	db                       *sql.DB             `json:"-"`
 	mu                       sync.Mutex          `json:"-"`
 	wg                       sync.WaitGroup      `json:"-"`
 }
 
-// NewExpressionsStore initializes the expressions store with default values.
-//
-// No parameters.
-// Returns a pointer to ExpressionsStore.
 func NewExpressionsStore() *ExpressionsStore {
-	// Инициализируем хранилище выражений дефолтными значениями
-	return &ExpressionsStore{
-		Expressions:              make(map[int]*Expression),
-		OperationsTime:           map[string]int{"add": 60, "sub": 60, "mul": 120, "div": 120},
-		MachineNums:              4,
-		ComputationalCapabilitys: make(map[string]string),
+	// Получаем учетные данные из переменных окружения
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	// Формируем строку подключения к базе данных
+	_ = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+
+	// Открываем соединение с базой данных
+	db, err := sql.Open("postgres", "postgresql://postgres:1234@localhost/expressionsStore?sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	// Проверяем соединение с базой данных
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Создаем пустое expressionsStore
+	expressionsStore := &ExpressionsStore{}
+
+	expressionsStore.db = db
+
+	// Загружаем выражения из базы данных
+	expressions, err := LoadExpressionsFromDB(expressionsStore.db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Заполняем expressionsStore значениями
+	expressionsStore.Expressions = expressions
+	expressionsStore.OperationsTime = map[string]int{"add": 60, "sub": 60, "mul": 120, "div": 120}
+	expressionsStore.MachineNums = 4
+	expressionsStore.ComputationalCapabilitys = make(map[string]string)
+
+	return expressionsStore
 }
 
-// AddExpression adds an expression to the ExpressionsStore if it does not already exist.
-//
-// Parameters:
-// - expression *Expression: the expression to be added to the store
-// Returns:
-// - bool: true if the expression was added, false if it already exists in the store
 func (e *ExpressionsStore) AddExpression(expression *Expression) bool {
 	// Проверяем наличие выражения в хранилище по ID
 	_, ok := e.Expressions[expression.ID]
@@ -73,15 +102,44 @@ func (e *ExpressionsStore) AddExpression(expression *Expression) bool {
 	return false
 }
 
-// SetCompCapability sets the computational capability for the given CPU name.
-// It takes a string cpuName and a slice of strings operations, and does not return anything.
 func (e *ExpressionsStore) SetCompCapability(cpuName string, operations []string) {
 	e.ComputationalCapabilitys[cpuName] = strings.Join(operations, ", ")
 }
 
-// SubmitExpression handles the submission of an expression and performs various operations.
-//
-// It takes http.ResponseWriter and *http.Request as parameters and does not return anything.
+func SaveExpressionToDB(expression *Expression, db *sql.DB) error {
+	_, err := db.Exec("INSERT INTO expressions (id, content, status, result, created_at, calculated_at) VALUES ($1, $2, $3, $4, $5, $6)",
+		expression.ID, expression.Content, expression.Status, expression.Result, expression.CreatedAt, expression.CalculatedAt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LoadExpressionsFromDB(db *sql.DB) (map[int]*Expression, error) {
+	var expressions = make(map[int]*Expression)
+
+	rows, err := db.Query("SELECT id, content, status, result, created_at, calculated_at FROM expressions")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var expression Expression
+		err := rows.Scan(&expression.ID, &expression.Content, &expression.Status, &expression.Result, &expression.CreatedAt, &expression.CalculatedAt)
+		if err != nil {
+			return nil, err
+		}
+		expressions[expression.ID] = &expression
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return expressions, nil
+}
+
 func SubmitExpression(w http.ResponseWriter, r *http.Request) {
 	// Извлекаем параметры из запроса
 	queryParams := r.URL.Query()
@@ -107,6 +165,12 @@ func SubmitExpression(w http.ResponseWriter, r *http.Request) {
 		Status:    "The expression will be calculated soon",
 		Result:    "?",
 		CreatedAt: time.Now(),
+	}
+
+	// Сохраняем выражение в БД
+	err := SaveExpressionToDB(expression, expressionsStore.db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	// Увеличиваем счетчик идентификатора выражения
@@ -136,10 +200,6 @@ func SubmitExpression(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
-// GetExpressionsList sends a GET request to /get-result to retrieve a list of expressions with processed data results.
-//
-// Parameters: w (http.ResponseWriter), r (*http.Request).
-// Returns: void.
 func GetExpressionsList(w http.ResponseWriter, r *http.Request) {
 	// Отправляем GET-запрос на /get-result для получения списка выражений с результатами обработки данных
 	response, err := http.Get("http://localhost:8080/get-result")
@@ -164,12 +224,6 @@ func GetExpressionsList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetExpressionsId extracts parameters from the request and retrieves expression data by its ID.
-//
-// Parameters:
-// - w: http.ResponseWriter
-// - r: *http.Request
-// Return type(s):
 func GetExpressionsId(w http.ResponseWriter, r *http.Request) {
 	// Извлекаем параметры из запроса
 	queryParams := r.URL.Query()
@@ -195,9 +249,6 @@ func GetExpressionsId(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(value.Content + " - " + value.Status + " - " + value.CreatedAt.Format("2006-01-02 15:04:05") + " - " + value.CalculatedAt.Format("2006-01-02 15:04:05")))
 }
 
-// OperationsList is a Go function that processes the query parameters from the request and updates the operations time, then writes the operation execution time for each operation.
-//
-// w http.ResponseWriter, r *http.Request.
 func OperationsList(w http.ResponseWriter, r *http.Request) {
 	// Извлекаем параметры из запроса
 	queryParams := r.URL.Query()
@@ -248,14 +299,6 @@ func OperationsList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetComputationalCapabilitysList retrieves the list of computational capabilities and writes the information to the http.ResponseWriter.
-//
-// Parameters:
-//
-//	w http.ResponseWriter - the response writer
-//	r *http.Request - the http request
-//
-// Return type(s): None
 func GetComputationalCapabilitysList(w http.ResponseWriter, r *http.Request) {
 	if expressionsStore.CurrentWorkers == 0 {
 		w.Write([]byte("Computing resources is free. Goruntines available: " + strconv.Itoa(expressionsStore.MachineNums) + "\n"))
@@ -267,11 +310,6 @@ func GetComputationalCapabilitysList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// CalcMachine calculates the given expression using the specified CPU number.
-//
-// expression *Expression: the expression to be calculated
-// cpuNum int: the number of the CPU to be used for the calculation
-// bool: true if the calculation is successful, false otherwise
 func CalcMachine(expression *Expression, cpuNum int) bool {
 	defer expressionsStore.wg.Done()
 	expressionsStore.mu.Lock()
@@ -331,9 +369,6 @@ func CalcMachine(expression *Expression, cpuNum int) bool {
 	return true
 }
 
-// SetCalcTask updates the available workers and starts calculating expressions in separate goroutines.
-//
-// w http.ResponseWriter, r *http.Request
 func SetCalcTask(w http.ResponseWriter, r *http.Request) {
 
 	availableWorkers := expressionsStore.MachineNums - expressionsStore.CurrentWorkers
@@ -351,20 +386,12 @@ func SetCalcTask(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
-// GetCalcTask retrieves and writes the expressions content, result, status, creation and calculation timestamps to the http.ResponseWriter.
-//
-// w http.ResponseWriter, r *http.Request
-// None
 func GetCalcTask(w http.ResponseWriter, r *http.Request) {
 	for _, expression := range expressionsStore.Expressions {
 		w.Write([]byte(expression.Content + "=" + expression.Result + " - " + expression.Status + " - " + expression.CreatedAt.Format("2006-01-02 15:04:05") + " - " + expression.CalculatedAt.Format("2006-01-02 15:04:05") + "\n"))
 	}
 }
 
-// CORS adds middleware for accessing from a different origin.
-//
-// The parameter next is of type http.HandlerFunc.
-// The return type is http.HandlerFunc.
 func CORS(next http.HandlerFunc) http.HandlerFunc {
 	// Добавляем middleware для доступа к другому источнику
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -378,10 +405,32 @@ func CORS(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// main is the entry point of the program.
-//
-// No parameters.
-// No return values.
+func init() {
+	// Получаем учетные данные из переменных окружения
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	// Формируем строку подключения к базе данных
+	dbURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+
+	// Открываем соединение с базой данных
+	db, err := sql.Open("postgres", dbURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Проверяем соединение с базой данных
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	expressionsStore.db = db
+}
+
 func main() {
 	// TODO: Реализовать загрузку состояния из СУБД
 	// Создаем мультиплексор для управления маршрутами
@@ -408,6 +457,8 @@ func main() {
 
 	// Получение списка вычислительных ресурсов
 	mux.HandleFunc("/status", CORS(GetComputationalCapabilitysList))
+
+	defer expressionsStore.db.Close()
 
 	http.ListenAndServe(":8080", mux)
 }
