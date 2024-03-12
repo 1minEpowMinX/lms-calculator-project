@@ -56,10 +56,10 @@ func NewExpressionsStore() *ExpressionsStore {
 	dbName := os.Getenv("DB_NAME")
 
 	// Формируем строку подключения к базе данных
-	_ = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+	postgresUser = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
 
 	// Открываем соединение с базой данных
-	db, err := sql.Open("postgres", "postgresql://postgres:1234@localhost/expressionsStore?sslmode=disable")
+	db, err := sql.Open("postgres", postgresUser)
 	if err != nil {
 		log.Fatal(err)
 	}
