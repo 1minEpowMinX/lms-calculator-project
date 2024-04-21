@@ -4,7 +4,7 @@ A user wants to count arithmetic expressions. He enters the string 2 + 2 * 2 and
 # Running Instructions for the Application
 
 This guide will help you run your application, consisting of backend and frontend servers, using the Go programming language.
-
+<!--
 ## Step 1: Get the Source Code
 
 First, you need to clone the repository of your project to your local machine. To do this, execute the following command in the terminal:
@@ -46,5 +46,6 @@ After completing the previous step, your servers will be up and running. Open a 
 - ```/get-task``` - GET request to get a task to perform computational operations.
 - ```/get-result``` - GET request to get the results of computational tasks.
 - ```/status``` - GET request to get the list of available computing resources and their current status.
+-->
 
 That should be all you need to run your application. Happy coding!
