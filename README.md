@@ -32,11 +32,11 @@ After completing the previous step, your servers will be up and running. Open a 
 
 - If you need to change ports or any other settings, you can do so by editing the corresponding configuration project files.
 - Make sure all project dependencies are installed. If you encounter any errors during the startup process, ensure all necessary dependencies are installed using `go get`.
-<!--
+
 ## How it works?
 
-  ![Untitled-2024-02-26-1032](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/393293f6-2bc8-478b-bfc2-1bb027eaa8e0)  
-
+  Available soon 
+<!--
 ## Endpoint Descriptions
 
 - ```/submit``` - POST request to add a new arithmetic expression. Accepts a "content" parameter with the expression itself. Returns the ID of the added expression.
