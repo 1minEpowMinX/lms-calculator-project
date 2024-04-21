@@ -1,0 +1,50 @@
+body {
+	background-color: #0f5e53;
+	font-family: Verdana, Tahoma, sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	height: 100vh;
+	margin: 0;
+}
+
+.container {
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	padding: 350px;
+}
+
+.container input {
+	background-color: white;
+	border: 2px solid #ccc;
+	width: 100%;
+	max-width: 287px;
+	padding: 8px;
+	border-radius: 3px;
+}
+
+.container label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.container button {
+	background-color: white;
+	color: #0f5e53;
+	border: none;
+	cursor: pointer;
+	width: 150px;
+	height: 30px;
+	margin-top: 3px;
+}
+
+.toggle-password {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+}
