@@ -4,7 +4,7 @@ A user wants to count arithmetic expressions. He enters the string 2 + 2 * 2 and
 # Running Instructions for the Application
 
 This guide will help you run your application, consisting of backend and frontend servers, using the Go programming language.
-<!--
+
 ## Step 1: Get the Source Code
 
 First, you need to clone the repository of your project to your local machine. To do this, execute the following command in the terminal:
@@ -20,13 +20,13 @@ Make sure you have Go installed on your computer. If Go is not installed, you ca
 1. Open a terminal and navigate to the root directory of your project.
 2. Execute the following command to run the application:
 ```sh
-go run main.go
+make run-project
 ```
 This command will start your application. It will compile and run the backend and frontend servers.
 
 ## Step 4: Checking the Application
 
-After completing the previous step, your servers will be up and running. Open a web browser and navigate to `http://localhost:<port>`, where `<port>` is the port of your frontend (8081) and backend (8080) servers. You should see the application running.
+After completing the previous step, your servers will be up and running. Open a web browser and navigate to `http://localhost:<port>`, where `<port>` is the port of your frontend (8080) server. You should see the application running.
 
 ## Notes
 
@@ -35,8 +35,8 @@ After completing the previous step, your servers will be up and running. Open a 
 
 ## How it works?
 
-  ![Untitled-2024-02-26-1032](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/393293f6-2bc8-478b-bfc2-1bb027eaa8e0)  
-
+  Available soon 
+<!--
 ## Endpoint Descriptions
 
 - ```/submit``` - POST request to add a new arithmetic expression. Accepts a "content" parameter with the expression itself. Returns the ID of the added expression.
