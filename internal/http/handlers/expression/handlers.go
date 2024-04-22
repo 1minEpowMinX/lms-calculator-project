@@ -55,7 +55,7 @@ func CreateExpressionHandler(ctx context.Context, expressionSaver ExpressionInte
 		cookie, err := r.Cookie("auth_token")
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
-			log.Printf("no cookie found")
+			log.Printf("No cookie found")
 			return
 		}
 
@@ -64,13 +64,13 @@ func CreateExpressionHandler(ctx context.Context, expressionSaver ExpressionInte
 		tokenValue, err := jwts.VerifyJWTToken(tokenString)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
-			log.Printf("error: %v", err)
+			log.Printf("Error: %v", err)
 			return
 		}
 		userID, err := strconv.ParseInt(tokenValue, 10, 64)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Printf("error: %v", err)
+			log.Printf("Error: %v", err)
 			return
 		}
 
@@ -102,7 +102,7 @@ func GetExpressionsHandler(ctx context.Context, expressionSaver ExpressionIntera
 		cookie, err := r.Cookie("auth_token")
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
-			log.Printf("no cookie found")
+			log.Printf("No cookie found")
 			return
 		}
 
@@ -111,13 +111,13 @@ func GetExpressionsHandler(ctx context.Context, expressionSaver ExpressionIntera
 		tokenValue, err := jwts.VerifyJWTToken(tokenString)
 		if err != nil {
 			http.Redirect(w, r, "/auth", http.StatusSeeOther)
-			log.Printf("error: %v", err)
+			log.Printf("Error: %v", err)
 			return
 		}
 		userID, err := strconv.ParseInt(tokenValue, 10, 64)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Printf("error: %v", err)
+			log.Printf("Error: %v", err)
 			return
 		}
 

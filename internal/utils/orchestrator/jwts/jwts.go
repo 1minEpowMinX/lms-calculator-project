@@ -10,9 +10,8 @@ import (
 
 var secretKey = os.Getenv("JWT_SECRET_KEY")
 
-// GenerateJWTToken generates a new jwt token for user
+// Генерация токенов для юзеров
 func GenerateJWTToken(userID int64) (string, error) {
-
 	now := time.Now()
 	userIDStr := fmt.Sprintf("%d", userID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -30,9 +29,8 @@ func GenerateJWTToken(userID int64) (string, error) {
 	return tokenString, nil
 }
 
-// VerifyJWTToken verifies jwt token (used in middleware)
+// Проверка токенов через middleware
 func VerifyJWTToken(tokenString string) (string, error) {
-
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return "", fmt.Errorf("unexpected signing method: %v", t.Header["alg"])

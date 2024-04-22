@@ -13,17 +13,19 @@ import (
 func ConnectToAgent() (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial("localhost:5000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Println("could not connect to grpc server:", err)
+		log.Println("Could not connect to grpc server:", err)
 		return nil, err
 	}
 
-	log.Println("connection status:", conn.GetState())
+	log.Println("Connection status:", conn.GetState())
 	return conn, nil
 }
 
+// Соединение с агентом
 func Calculate(ctx context.Context, expr string) (float64, error) {
 	conn, err := ConnectToAgent()
 	if err != nil {
+		log.Fatalf("Failed connect to agent: %v", err)
 		return 0, err
 	}
 
@@ -31,6 +33,7 @@ func Calculate(ctx context.Context, expr string) (float64, error) {
 
 	ans1, err := grpcClient.Calculate(ctx, &pb.ExpressionRequest{Expression: expr})
 	if err != nil {
+		log.Printf("Failed get answer from agent: %v", err)
 		return 0, err
 	}
 

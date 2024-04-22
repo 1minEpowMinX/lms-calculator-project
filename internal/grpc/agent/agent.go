@@ -37,19 +37,23 @@ func (s *Server) Calculate(ctx context.Context, in *pb.ExpressionRequest) (*pb.E
 	if err != nil {
 		return nil, err
 	}
-	log.Println("successful operation!")
+	log.Println("Successful operation!")
 	return &pb.ExpressionResponse{Result: res}, nil
 }
 
 func RunAgentServer() {
-	addr := "localhost:5000"
+	host := "localhost"
+	port := "5000"
+
+	addr := fmt.Sprintf("%v:%v", host, port)
+
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Println("error starting tcp listener: ", err)
+		log.Println("Error starting TCP listener: ", err)
 		os.Exit(1)
 	}
 
-	log.Printf("tcp listener started at %s", addr)
+	log.Printf("TCP listener started at %s", addr)
 
 	grpcServer := grpc.NewServer()
 
@@ -58,7 +62,7 @@ func RunAgentServer() {
 	pb.RegisterCalculatorServiceServer(grpcServer, expressionServiceServer)
 
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Println("error serving grpc: ", err)
+		log.Println("Error serving grpc: ", err)
 		os.Exit(1)
 	}
 }

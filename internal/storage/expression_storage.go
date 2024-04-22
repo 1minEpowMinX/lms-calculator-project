@@ -4,8 +4,6 @@ import (
 	"context"
 )
 
-// Model methods for expressions table in database
-
 type Expression struct {
 	ID         int64
 	UserID     int64
@@ -15,9 +13,8 @@ type Expression struct {
 	Status     string // Types: stored, done, error
 }
 
-// InsertExpression - putting new expression into database table
+// Вставка выражения в БД
 func (s *Storage) InsertExpression(ctx context.Context, expr *Expression) (int64, error) {
-
 	var q = `
 	INSERT INTO expressions (userid, expression, answer, date, status) values ($1, $2, $3, $4, $5)
 	`
@@ -35,9 +32,8 @@ func (s *Storage) InsertExpression(ctx context.Context, expr *Expression) (int64
 	return id, nil
 }
 
-// SelectExpressions - returns all expressions slice from database table
+// Возврат всех выражений из БД
 func (s *Storage) SelectAllExpressions(ctx context.Context) ([]Expression, error) {
-
 	var (
 		expressions []Expression
 		q           = `SELECT id, expression, answer, date, status FROM expressions`
@@ -62,11 +58,10 @@ func (s *Storage) SelectAllExpressions(ctx context.Context) ([]Expression, error
 	return expressions, nil
 }
 
-// SelectExpressionByID - guess yourself :)
+// Выборка выражений по ID из БД
 func (s *Storage) SelectExpressionsByID(ctx context.Context, userID int64) ([]Expression, error) {
-
-	var ( 
-		q = `SELECT id, expression, answer, date, status FROM expressions WHERE userid = $1`
+	var (
+		q           = `SELECT id, expression, answer, date, status FROM expressions WHERE userid = $1`
 		expressions []Expression
 	)
 
@@ -89,7 +84,7 @@ func (s *Storage) SelectExpressionsByID(ctx context.Context, userID int64) ([]Ex
 	return expressions, nil
 }
 
-// UpdateExpression - updates data about expression, specifically its answer and/or status
+// Обновление выражения из БД
 func (s *Storage) UpdateExpression(
 	ctx context.Context, answer, status string, id int64,
 ) error {
@@ -104,7 +99,7 @@ func (s *Storage) UpdateExpression(
 	return nil
 }
 
-// DeleteExpression - deletes expression row from database table
+// Удаление выражения из БД
 func (s *Storage) DeleteExpression(ctx context.Context, id int64) error {
 
 	var q = `DELETE FROM expressions WHERE id = ?`

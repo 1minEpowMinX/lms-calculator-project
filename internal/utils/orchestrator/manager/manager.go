@@ -10,26 +10,25 @@ import (
 	"github.com/1minepowminx/distributed_calculator/internal/storage"
 )
 
+const (
+	done    = "done"
+	trouble = "error"
+	null    = "null"
+)
+
 type ExpressionUpdater interface {
-	UpdateExpression(ctx context.Context, answer, status string, id int64,) error
+	UpdateExpression(ctx context.Context, answer, status string, id int64) error
 	SelectAllExpressions(ctx context.Context) ([]storage.Expression, error)
 }
 
-// all this states must be somewhere else than here
-var (
-	done = "done"
-	trouble = "error"
-	null = "null"
-)
-
+// Менеджер запуска оркестратора
 func RunManager(ctx context.Context, expressionUpdater ExpressionUpdater) {
-	
-	log.Println("running Orchestrator manager")
+	log.Println("Running Orchestrator manager")
 	for {
 		go func() {
 			storedExpressions, err := expressionUpdater.SelectAllExpressions(ctx)
 			if err != nil {
-				log.Printf("could not SelectExpressions() from database: %v", err)
+				log.Printf("Could not SelectExpressions() from database: %v", err)
 			}
 
 			for _, expression := range storedExpressions {
@@ -38,7 +37,7 @@ func RunManager(ctx context.Context, expressionUpdater ExpressionUpdater) {
 				} else {
 					ans, err := orchestrator.Calculate(ctx, expression.Expression)
 					if err != nil {
-						log.Printf("could not Calculate(): %v", err)
+						log.Printf("Could not Calculate(): %v", err)
 						expressionUpdater.UpdateExpression(
 							ctx, null, trouble, expression.ID,
 						)
@@ -50,7 +49,7 @@ func RunManager(ctx context.Context, expressionUpdater ExpressionUpdater) {
 					if err = expressionUpdater.UpdateExpression(
 						ctx, res, done, expression.ID,
 					); err != nil {
-						log.Printf("could not UpdateExpression(): %v", err)
+						log.Printf("Could not UpdateExpression(): %v", err)
 					}
 				}
 			}
@@ -59,4 +58,3 @@ func RunManager(ctx context.Context, expressionUpdater ExpressionUpdater) {
 		time.Sleep(7 * time.Second)
 	}
 }
-

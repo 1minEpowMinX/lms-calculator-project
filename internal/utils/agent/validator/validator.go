@@ -7,6 +7,7 @@ var validChars = map[rune]bool{
 	'(': true, ')': true, ' ': true,
 }
 
+// Проверка на валидность выражения
 func IsValidExpression(expr string) bool {
 	if !isValidExpression(expr) || !isBalanced(expr) {
 		return false

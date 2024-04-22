@@ -5,10 +5,8 @@ import (
 )
 
 // Певращение обычных выражений в постфиксную запись
-// s string = "2+ 2 *2"
-// return "2 2 2 * +"
 func ToPostfix(s string) string {
-	// объявления стека, постфиксной строки
+	// объявление стека, постфиксной строки
 	var stack Stack
 	postfix := ""
 	length := len(s)

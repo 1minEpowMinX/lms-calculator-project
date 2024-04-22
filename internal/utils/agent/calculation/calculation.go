@@ -6,13 +6,14 @@ import (
 	"strings"
 )
 
+// Рассчет выражений
 func Evaluate(expr string) (float64, error) {
 	var stack Stack
 	tokens := strings.Split(expr, " ")
 
 	for _, token := range tokens {
 		if token == "+" || token == "-" || token == "*" || token == "/" {
-			// если токен - оператор, то забираем 2 последних элемента со стека
+			// если токен - оператор, забираем 2 последних элемента со стека
 			op1 := stack.Pop()
 			op2 := stack.Pop()
 			ans, err := Calculate(op1, op2, token)
@@ -21,13 +22,13 @@ func Evaluate(expr string) (float64, error) {
 			}
 			stack.Push(ans)
 		} else {
-			// если токен не оператор - то операнд(число), пушим в стек :)
+			// если токен не оператор - подходит для пуша
 			op, _ := strconv.ParseFloat(token, 64)
 
 			stack.Push(op)
 		}
 	}
-	// в этом случае, последний элемент стека и есть наш ответ
+	// последний элемент, исходя из принципов LIFO - нужный элемент
 	return stack.Pop(), nil
 }
 

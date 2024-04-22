@@ -8,13 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Model functions for initializing database and its tables
-
 type Storage struct {
 	db *sql.DB
 }
 
-// New - creates new database in the given storagePath with tables
+// Создание БД по нужному пути
 func New(storagePath string) (*Storage, error) {
 	const op = "storage/storage-New"
 	ctx := context.TODO()
@@ -36,7 +34,7 @@ func New(storagePath string) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-// createTables - pops up two tables in the given database
+// Создание таблиц для БД
 func createTables(ctx context.Context, db *sql.DB) error {
 	const (
 		usersTable = `
