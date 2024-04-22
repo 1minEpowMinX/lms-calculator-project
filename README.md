@@ -28,16 +28,16 @@ This command will start your application. It will compile and run the backend an
 
 After completing the previous step, your servers will be up and running. Open a web browser and navigate to `http://localhost:<port>`, where `<port>` is the port of your frontend (8080) server. You should see the application running.
 
-## Notes
+# Notes
 
 - If you need to change ports or any other settings, you can do so by editing the corresponding configuration project files.
 - Make sure all project dependencies are installed. If you encounter any errors during the startup process, ensure all necessary dependencies are installed using `go get`.
 
-## How it works?
+# How it works?
 
 ![Untitled-2024-04-22-1149](https://github.com/1minEpowMinX/lms-calculator-project/assets/129176682/bd57ae1c-8c08-49f4-aa1d-e11bf7cfe726)
   
-## Endpoint Descriptions
+# Endpoint Descriptions
 
 - ```POST /auth/signup/``` - this endpoint is for registering new users. It accepts a JSON object with a username and password. If a user with the specified name already exists, it returns an error. Otherwise, it creates a new account and returns success status.
 - ```POST /auth/login/``` - this endpoint is designed for user authentication. It accepts a JSON object with username and password. After successful authentication, it sets a cookie with the authentication token and redirects to the main page. In case of authentication error, it returns an appropriate error.
