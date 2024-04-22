@@ -12,8 +12,6 @@ import (
 	"github.com/1minepowminx/distributed_calculator/internal/utils/orchestrator/jwts"
 )
 
-// Handlers for operations with expressions
-
 type Request struct {
 	Expression string `json:"expression"`
 }
@@ -26,7 +24,7 @@ type ResponseData struct {
 	Status     string `json:"status"`
 }
 
-type ExpressionInteractor interface { // Methods for interactions with database
+type ExpressionInteractor interface {
 	InsertExpression(ctx context.Context, expr *storage.Expression) (int64, error)
 	SelectExpressionsByID(ctx context.Context, userID int64) ([]storage.Expression, error)
 	DeleteExpression(ctx context.Context, id int64) error
@@ -36,9 +34,8 @@ type contextKey string
 
 const UserIDKey contextKey = "userid"
 
-// CreateExpressionHandler - post method handler which stores an expression
+// Обработчик для сохранения выражения в БД
 func CreateExpressionHandler(ctx context.Context, expressionSaver ExpressionInteractor) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -93,9 +90,8 @@ func CreateExpressionHandler(ctx context.Context, expressionSaver ExpressionInte
 	}
 }
 
-// GetExpressionHandler - get method handler which writes all expressions from database
+// Обработчик для получения списка всех выражений из БД
 func GetExpressionsHandler(ctx context.Context, expressionSaver ExpressionInteractor) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -146,9 +142,8 @@ func GetExpressionsHandler(ctx context.Context, expressionSaver ExpressionIntera
 	}
 }
 
-// DeleteExpressionHandler
+// Обработчик удаления выражения из БД
 func DeleteExpressionHandler(ctx context.Context, expressionSaver ExpressionInteractor) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
